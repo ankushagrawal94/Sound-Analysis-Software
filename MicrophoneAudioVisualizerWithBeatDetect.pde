@@ -15,13 +15,15 @@ Minim minim;
 AudioInput in;
 FFT fft;
 BeatDetect beat;
-boolean beatOn;
 
-int red=0;
-int green = 0;
-int blue = 0;
 
-float heightOfBar;
+int red = 0;      //Used to control the red RGB value
+int green = 0;    //Used to control the green RGB value
+int blue = 0;     //Used to control the blue RGB value
+boolean beatDetected;  //Used to keep track of when a beat was detected
+float heightOfBar;     //Height of the bar corresponding to each frequency
+int baseHeight = 20;   //Default base height of bars
+int amplification = 32;//Amplification factor
 
 void setup()
 {
@@ -29,50 +31,31 @@ void setup()
   minim = new Minim(this);
   in = minim.getLineIn(Minim.MONO, 4096, 44100);
   fft = new FFT(in.left.size(), 44100);
-  // a beat detection object song SOUND_ENERGY mode with a sensitivity of 10 milliseconds
   beat = new BeatDetect();
 }
 
 void draw()
 {
   colorMode(RGB);  
-  background(0);
-  fft.forward(in.left);
+  background(0);             //Used to reset the output to a plain screen
+  fft.forward(in.left);      //Used to read in and analyze input
+  strokeWeight(8);           //The width of each "bar"
+  stroke(red, green, blue);  //Assign the color for the bars
   
-  strokeWeight(8);
-  stroke(red, green, blue);
-  
-  beatOn = false;
-  beat.detect(in.mix);
-  if ( beat.isOnset() )
-     beatOn = true;
+  beatDetected = false;      //reset the value
+  beat.detect(in.mix);       //check for a beat
+  if (beat.isOnset())
+     beatDetected = true;    //set beatDetected flag to true
+     
   for(int i = 0; i < fft.specSize(); i++)
   {
-    red = 50;
-    green = 0;
-    blue = 0;
-    heightOfBar = fft.getBand(i)*8;
-    //amplify all signals on beat detection
-    if(beatOn = true)
-      heightOfBar *= 2;
-    //make the shade of red a function of heightOfBar
-    if (heightOfBar > height/1.5)
-    {
-      red = 255;
-    }
-    else if (heightOfBar > height/2)
-    {
-      red = 150;
-    }
-    else
-    {
-      red = 100;   
-    }
-    //The 160 offset gets rid of a lot of extreme peaks you get on the left side
+    red = 100;    //reset the value of red for each iteration of the loop
+    heightOfBar = baseHeight + fft.getBand(i)*amplification;  //Amplification can be removed when normalizing feature added
+    if(beatDetected = true)
+      heightOfBar *= 2;      //amplify all signals on beat detection
+    red = (int)(heightOfBar/4) + 100;        //make the shade of red a function of heightOfBar
     stroke(red, green, blue);
-    line(i-160, height, i-160, height - heightOfBar);
-    //line(i-160, height-heightOfBar-10, i-160, height - heightOfBar); //highlight the peaks
-    
+    line(i-160, height, i-160, height - heightOfBar);  //The 160 offset gets rid of a lot of extreme peaks you get on the left side
   }
 }
 
