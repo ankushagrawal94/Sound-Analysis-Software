@@ -1,11 +1,12 @@
 This code is designed to be used with the Processing application. It utilizes
 the Minim audio library. The functions utilized include the FFT analysis and the
-BeatDetection classes.
+beat detection.
 
 This code reads input from my local micrphone and performs an FFT analysis using
-the Minim library. It determines frequencies based on this input and the
-presence of a beat. Once the heights have been determined, it draws the output
-in a new window. The colors of the bars are a function of the loudness of its
-corresponding frequency.
+the Minim library. It determines frequencies based on this input and then
+determines the loudness of each of these frequencies. This is used, along with
+the beat, to change the height of the bars. Once the heights have been 
+determined, it draws the output in a new window. The colors of the bars are a 
+function of the loudness of its corresponding frequency.
 
 This code is free to use, modify, and edit. Enjoy!
